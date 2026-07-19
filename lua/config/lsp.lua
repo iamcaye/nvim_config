@@ -57,25 +57,35 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-vim.lsp.config('lua_ls', {
-  settings = {
-    Lua = {
-      completion = {
-        callSnippet = 'Replace',
-      },
-      diagnostics = {
-        globals = { 'vim', 'Snacks' },
+local servers = {
+  lua_ls = {
+    cmd = 'lua-language-server',
+    config = {
+      settings = {
+        Lua = {
+          completion = {
+            callSnippet = 'Replace',
+          },
+          diagnostics = {
+            globals = { 'vim', 'Snacks' },
+          },
+        },
       },
     },
   },
-})
-
-vim.lsp.config('eslint', {
-  settings = {
-    workingDirectories = { mode = 'auto' },
+  eslint = {
+    cmd = 'vscode-eslint-language-server',
+    config = {
+      settings = {
+        workingDirectories = { mode = 'auto' },
+      },
+    },
   },
-})
+}
 
-for _, server in ipairs({ 'lua_ls', 'eslint' }) do
-  vim.lsp.enable(server)
+for name, server in pairs(servers) do
+  vim.lsp.config(name, server.config)
+  if vim.fn.executable(server.cmd) == 1 then
+    vim.lsp.enable(name)
+  end
 end
