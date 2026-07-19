@@ -1,0 +1,38 @@
+local gh = function(repo)
+  return 'https://github.com/' .. repo
+end
+
+vim.pack.add({
+  { src = gh('Shatur/neovim-ayu'), name = 'neovim-ayu' },
+  { src = gh('nvim-lua/plenary.nvim') },
+  { src = gh('nvim-telescope/telescope.nvim') },
+  { src = gh('nvim-telescope/telescope-ui-select.nvim') },
+  { src = gh('nvim-tree/nvim-web-devicons') },
+  { src = gh('stevearc/oil.nvim') },
+  { src = gh('echasnovski/mini.icons') },
+  { src = gh('ThePrimeagen/harpoon'), version = 'harpoon2' },
+  { src = gh('lewis6991/gitsigns.nvim') },
+  { src = gh('numToStr/Comment.nvim') },
+  { src = gh('folke/which-key.nvim') },
+  { src = gh('folke/snacks.nvim') },
+  { src = gh('nvim-treesitter/nvim-treesitter') },
+  { src = gh('nvim-treesitter/nvim-treesitter-textobjects') },
+  { src = gh('neovim/nvim-lspconfig') },
+  { src = gh('folke/lazydev.nvim') },
+  { src = gh('stevearc/conform.nvim') },
+  { src = gh('mfussenegger/nvim-lint') },
+  { src = gh('windwp/nvim-autopairs') },
+  { src = gh('mfussenegger/nvim-dap') },
+  { src = gh('rcarriga/nvim-dap-ui') },
+  { src = gh('nvim-neotest/nvim-nio') },
+  { src = gh('leoluz/nvim-dap-go') },
+  { src = gh('wakatime/vim-wakatime') },
+  { src = gh('github/copilot.vim'), version = 'release' },
+  { src = gh('folke/sidekick.nvim') },
+  { src = gh('rcarriga/nvim-notify') },
+  { src = gh('folke/noice.nvim') },
+  { src = gh('MunifTanjim/nui.nvim') },
+}, {
+  confirm = false,
+  load = true,
+})
