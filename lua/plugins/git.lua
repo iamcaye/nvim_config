@@ -9,6 +9,7 @@ require('gitsigns').setup({
   current_line_blame = true,
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
+    local snacks = require('snacks')
 
     local map = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
@@ -40,6 +41,12 @@ require('gitsigns').setup({
     map('n', '<leader>hD', function()
       gitsigns.diffthis('@')
     end, 'Diff against last commit')
+
+
+    map('n', '<leader>gg', function()
+        snacks.lazygit()
+    end, 'Lazygit')
+
   end,
 })
 
