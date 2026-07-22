@@ -1,5 +1,6 @@
 local function lsp_clients()
   local clients = vim.lsp.get_clients({ bufnr = 0 })
+  print(vim.inspect(clients))
   if #clients == 0 then
     return ''
   end
@@ -16,8 +17,6 @@ require('lualine').setup({
     theme = 'ayu',
     icons_enabled = true,
     globalstatus = false,
-    component_separators = { left = '', right = '' },
-    section_separators = { left = '', right = '' },
   },
   sections = {
     lualine_a = { 'mode' },
@@ -31,7 +30,7 @@ require('lualine').setup({
       },
       'diagnostics',
     },
-    lualine_x = { lsp_clients },
+    -- lualine_x = { lsp_clients },
     lualine_y = { 'filetype' },
     lualine_z = { 'location', 'progress' },
   },
