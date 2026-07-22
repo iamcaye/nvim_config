@@ -10,6 +10,7 @@ vim.pack.add({
   { src = gh('nvim-tree/nvim-web-devicons') },
   { src = gh('stevearc/oil.nvim') },
   { src = gh('echasnovski/mini.icons') },
+  { src = gh('nvim-lualine/lualine.nvim') },
   { src = gh('ThePrimeagen/harpoon'), version = 'harpoon2' },
   { src = gh('lewis6991/gitsigns.nvim') },
   { src = gh('numToStr/Comment.nvim') },
