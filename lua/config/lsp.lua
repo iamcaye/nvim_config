@@ -81,6 +81,10 @@ local servers = {
       },
     },
   },
+  ts_ls = {
+    cmd = 'typescript-language-server',
+    config = {},
+  },
 }
 
 for name, server in pairs(servers) do

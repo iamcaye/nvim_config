@@ -13,6 +13,7 @@ require('config.autocmds')
 require('config.diagnostics')
 require('config.keymaps')
 require('config.pack')
+require('config.mason')
 require('config.lsp')
 
 require('plugins.files')
