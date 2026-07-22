@@ -21,6 +21,7 @@ opt.inccommand = 'split'
 opt.cursorline = true
 opt.scrolloff = 10
 opt.confirm = true
+opt.laststatus = 2
 opt.termguicolors = true
 opt.colorcolumn = '80,120'
 opt.tabstop = 4
