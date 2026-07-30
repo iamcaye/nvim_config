@@ -71,6 +71,10 @@ vim.keymap.set("n", "<leader>gk", function()
 	Snacks.terminal("kommit")
 end, { desc = "Kommit" })
 
+vim.keymap.set("n", "<leader>gd", function()
+	Snacks.terminal("hunk diff")
+end, { desc = "Hunk" })
+
 vim.keymap.set("n", "<leader>\\", function()
 	Snacks.explorer()
 end, { desc = "Toggle Explorer" })
