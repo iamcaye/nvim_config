@@ -67,6 +67,10 @@ vim.keymap.set("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "Lazygit" })
 
+vim.keymap.set("n", "<leader>gk", function()
+	Snacks.terminal("kommit")
+end, { desc = "Kommit" })
+
 vim.keymap.set("n", "<leader>\\", function()
 	Snacks.explorer()
 end, { desc = "Toggle Explorer" })
