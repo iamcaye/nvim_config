@@ -21,3 +21,12 @@ vim.api.nvim_create_autocmd('TermOpen', {
     vim.cmd.startinsert()
   end,
 })
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = augroup('picker_prompt'),
+  pattern = { 'TelescopePrompt', 'snacks_picker_input' },
+  desc = 'Disable native autocomplete in picker prompts',
+  callback = function(event)
+    vim.bo[event.buf].autocomplete = false
+  end,
+})

@@ -27,3 +27,21 @@ map('n', '<leader>qn', '<cmd>cnext<CR>', { desc = 'Next quickfix item' })
 map('n', '<leader>qp', '<cmd>cprev<CR>', { desc = 'Previous quickfix item' })
 
 map({ 'i', 'c' }, '<C-BS>', '<C-w>', { desc = 'Delete word' })
+
+local esc = vim.api.nvim_replace_termcodes('<Esc>', true, false, true)
+
+local toggle_current_line_comment = function()
+  local comment = require('Comment.api')
+  comment.toggle.linewise.current()
+end
+
+local toggle_visual_line_comment = function()
+  local comment = require('Comment.api')
+  vim.api.nvim_feedkeys(esc, 'nx', false)
+  comment.toggle.linewise(vim.fn.visualmode())
+end
+
+map('n', '<C-/>', toggle_current_line_comment, { desc = 'Toggle comment' })
+map('n', '<C-_>', toggle_current_line_comment, { desc = 'Toggle comment' })
+map('x', '<C-/>', toggle_visual_line_comment, { desc = 'Toggle comment' })
+map('x', '<C-_>', toggle_visual_line_comment, { desc = 'Toggle comment' })
