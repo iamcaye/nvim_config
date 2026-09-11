@@ -75,6 +75,16 @@ vim.keymap.set("n", "<leader>gd", function()
 	Snacks.terminal("hunk diff")
 end, { desc = "Hunk" })
 
+vim.keymap.set("n", "<leader>gbc", function()
+	local branch = vim.trim(vim.fn.system("git rev-parse --abbrev-ref HEAD"))
+	if vim.v.shell_error ~= 0 then
+		vim.notify("Not a git repository", vim.log.levels.ERROR)
+		return
+	end
+	vim.fn.setreg("+", branch)
+	vim.notify("Copied branch: " .. branch)
+end, { desc = "Copy Branch Name" })
+
 vim.keymap.set("n", "<leader>\\", function()
 	Snacks.explorer()
 end, { desc = "Toggle Explorer" })
