@@ -1,4 +1,5 @@
 local server_packages = {
+  angularls = 'angular-language-server',
   eslint = 'vscode-eslint-language-server',
   lua_ls = 'lua-language-server',
   ts_ls = 'typescript-language-server',

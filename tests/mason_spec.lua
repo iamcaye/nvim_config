@@ -33,9 +33,9 @@ assert(mason_setup_called, 'config.mason must configure Mason')
 assert(registered_command.name == 'LspInstall', 'must register :LspInstall')
 assert(registered_command.options.nargs == '*', ':LspInstall accepts zero or more servers')
 
-registered_command.callback({ fargs = { 'lua_ls', 'ts_ls' } })
+registered_command.callback({ fargs = { 'angularls', 'lua_ls', 'ts_ls' } })
 assert(
-  executed_commands[1] == 'MasonInstall lua-language-server typescript-language-server',
+  executed_commands[1] == 'MasonInstall angular-language-server lua-language-server typescript-language-server',
   ':LspInstall must translate LSP names to Mason package names'
 )
 

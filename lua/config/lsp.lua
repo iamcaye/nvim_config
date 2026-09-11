@@ -85,6 +85,10 @@ local servers = {
     cmd = 'typescript-language-server',
     config = {},
   },
+  angularls = {
+    cmd = 'ngserver',
+    config = {},
+  },
 }
 
 for name, server in pairs(servers) do
