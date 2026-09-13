@@ -45,3 +45,17 @@ require('gitsigns').setup({
 })
 
 require('Comment').setup()
+
+require('worktrees').setup()
+
+vim.keymap.set('n', '<leader>gw', function()
+    Snacks.picker.worktrees()
+end, { desc = 'Switch worktree' })
+
+vim.keymap.set('n', '<leader>gW', function()
+    Snacks.picker.worktrees_new()
+end, { desc = 'New worktree' })
+
+vim.keymap.set('n', '<leader>gx', function()
+    Snacks.picker.worktrees_remove()
+end, { desc = 'Remove worktree' })
