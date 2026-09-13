@@ -46,7 +46,20 @@ require('gitsigns').setup({
 
 require('Comment').setup()
 
-require('worktrees').setup()
+require('worktrees').setup({
+    switch_file_command = 'Oil',
+    hooks = {
+        -- Terminals keep the cwd they were opened with, so any left over
+        -- from the old worktree are stale after a switch. Prune them out of
+        -- the terminal orchestrator's slots (lua/config/terminal.lua), then
+        -- land in a fresh one already cd'd into the new worktree.
+        on_switch = function(from, _)
+            local term = require('config.terminal')
+            term.prune_under(from)
+            term.open('split')
+        end,
+    },
+})
 
 vim.keymap.set('n', '<leader>gw', function()
     Snacks.picker.worktrees()

@@ -3,10 +3,40 @@ local map = vim.keymap.set
 map('n', '<Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-map('n', '<leader>ts', '<cmd>split term://zsh<CR>', { desc = 'Terminal split' })
-map('n', '<leader>tv', '<cmd>vsplit term://zsh<CR>', { desc = 'Terminal vertical split' })
-map('n', '<leader>tt', '<cmd>tabnew term://zsh<CR>', { desc = 'Terminal tab' })
-map('n', '<leader>tf', '<cmd>edit term://zsh<CR>', { desc = 'Terminal fullscreen buffer' })
+
+-- Terminal orchestrator (lua/config/terminal.lua): each of split/vsplit/tab/
+-- fullscreen is a "slot" that can hold several terminals you cycle through,
+-- instead of one window == one terminal.
+local term = require('config.terminal')
+
+map('n', '<leader>ts', function()
+    term.open('split')
+end, { desc = 'Terminal split' })
+map('n', '<leader>tv', function()
+    term.open('vsplit')
+end, { desc = 'Terminal vertical split' })
+map('n', '<leader>tt', function()
+    term.open('tab')
+end, { desc = 'Terminal tab' })
+map('n', '<leader>tf', function()
+    term.open('fullscreen')
+end, { desc = 'Terminal fullscreen buffer' })
+
+map('n', '<leader>tn', function()
+    term.new()
+end, { desc = 'New terminal in current slot' })
+map('n', '<leader>tx', function()
+    term.close()
+end, { desc = 'Close terminal in current slot' })
+map('n', '<leader>tp', function()
+    term.pick()
+end, { desc = 'Pick terminal' })
+map('n', ']t', function()
+    term.cycle(1)
+end, { desc = 'Next terminal in slot' })
+map('n', '[t', function()
+    term.cycle(-1)
+end, { desc = 'Previous terminal in slot' })
 
 map('n', '<C-A-Up>', '<cmd>resize +2<CR>', { desc = 'Increase window height' })
 map('n', '<C-A-Down>', '<cmd>resize -2<CR>', { desc = 'Decrease window height' })
