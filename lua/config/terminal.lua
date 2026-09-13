@@ -204,22 +204,48 @@ function M.close(name)
     end
 end
 
---- Fuzzy-pick any open terminal across every slot (via vim.ui.select, which
---- Snacks renders through its own picker since picker.enabled = true).
+--- Best-effort hint at what a terminal last did: terminal buffers mirror the
+--- live screen, so the very last line is usually the current (possibly
+--- empty) prompt; the first non-blank line above it is typically the tail
+--- of the previous command's output, or the prompt+command line itself if
+--- that command printed nothing. Not exact (no shell integration to hand),
+--- but enough to tell terminals apart at a glance.
+local function recent_output(buf)
+    if not vim.api.nvim_buf_is_valid(buf) then
+        return ''
+    end
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    for i = #lines - 1, 1, -1 do
+        local trimmed = vim.trim(lines[i])
+        if trimmed ~= '' then
+            return #trimmed > 50 and (trimmed:sub(1, 47) .. '...') or trimmed
+        end
+    end
+    return ''
+end
+
+--- Fuzzy-pick any open terminal across every slot, with a live preview of
+--- its current screen content (Snacks.picker directly, not vim.ui.select,
+--- so we can attach a per-item preview). Setting `item.buf` to the real
+--- terminal buffer (rather than a text dump of its content) makes Snacks'
+--- default file previewer show that buffer as-is, ANSI colors included,
+--- since it's the actual buffer and not a copy.
 function M.pick()
     local items = {}
     for name, slot in pairs(slots) do
         for i, buf in ipairs(slot.terms) do
             if vim.api.nvim_buf_is_valid(buf) then
+                local recent = recent_output(buf)
                 table.insert(items, {
                     slot = name,
                     idx = i,
-                    text = string.format(
-                        '%s #%d  %s',
-                        name,
-                        i,
-                        vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ':~')
-                    ),
+                    buf = buf,
+                    text = string.format('%s #%d (%s)', name, i, term_label(buf))
+                        .. (recent ~= '' and ('  ' .. recent) or ''),
+                    -- Snacks' preview window defaults number=true (it's
+                    -- built for previewing source files); terminals don't
+                    -- want a gutter, same as the slot windows themselves.
+                    wo = { number = false, relativenumber = false, signcolumn = 'no' },
                 })
             end
         end
@@ -228,16 +254,18 @@ function M.pick()
         vim.notify('No terminals open', vim.log.levels.INFO)
         return
     end
-    vim.ui.select(items, {
-        prompt = 'Terminals',
-        format_item = function(item)
-            return item.text
+    Snacks.picker.pick({
+        items = items,
+        format = 'text',
+        confirm = function(picker, item)
+            picker:close()
+            if item then
+                vim.schedule(function()
+                    show(slots[item.slot], item.idx, true)
+                end)
+            end
         end,
-    }, function(item)
-        if item then
-            show(slots[item.slot], item.idx, true)
-        end
-    end)
+    })
 end
 
 --- Drop stale terminal buffers whose cwd sits under `path` from every slot's
