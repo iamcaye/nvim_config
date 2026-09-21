@@ -443,4 +443,35 @@ function M.prune_under(path)
     refresh_winbars()
 end
 
+-- A shell exiting (Ctrl-D, `exit`) makes Neovim delete its buffer behind our
+-- back, so drop it from the slot stacks and keep the slot window coherent.
+vim.api.nvim_create_autocmd({ 'BufDelete', 'BufWipeout' }, {
+    callback = function(event)
+        local buf = event.buf
+        vim.schedule(function()
+            for _, slot in pairs(slots) do
+                for i = #slot.terms, 1, -1 do
+                    if slot.terms[i] == buf then
+                        table.remove(slot.terms, i)
+                        if i < slot.idx or (i == slot.idx and slot.idx > #slot.terms) then
+                            slot.idx = slot.idx - 1
+                        end
+                        local win_ok = slot.win and vim.api.nvim_win_is_valid(slot.win)
+                        if #slot.terms == 0 then
+                            slot.idx = 0
+                            if win_ok and #vim.api.nvim_tabpage_list_wins(0) > 1 then
+                                vim.api.nvim_win_close(slot.win, true)
+                            end
+                            slot.win = nil
+                        elseif win_ok and vim.api.nvim_win_get_buf(slot.win) ~= slot.terms[slot.idx] then
+                            vim.api.nvim_win_set_buf(slot.win, slot.terms[slot.idx])
+                        end
+                    end
+                end
+            end
+            refresh_winbars()
+        end)
+    end,
+})
+
 return M
