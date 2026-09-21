@@ -115,8 +115,15 @@ function _G.__term_navbar_click(id)
     end
 end
 
+local last_slot -- name of the slot most recently shown, for toggle() to reopen
+
 local function show(slot, idx, insert)
     local win = ensure_window(slot)
+    for name, s in pairs(slots) do
+        if s == slot then
+            last_slot = name
+        end
+    end
     slot.idx = idx
     vim.api.nvim_win_set_buf(win, slot.terms[idx])
     vim.api.nvim_set_current_win(win)
@@ -290,11 +297,21 @@ local function usable(win, want_term)
         and (vim.bo[vim.api.nvim_win_get_buf(win)].buftype == 'terminal') == want_term
 end
 
---- From a terminal: back to the last non-terminal window. From anywhere
---- else: to the last terminal window (entering insert mode).
+--- In a split/vsplit terminal: hide its window (terminals keep running).
+--- In other terminals (tab/fullscreen): back to the last non-terminal window.
+--- From anywhere else: focus a visible terminal, or reopen the hidden one.
 function M.toggle()
     if vim.bo.buftype == 'terminal' then
         vim.cmd('stopinsert')
+        local name = slot_of_current_win()
+        if name == 'split' or name == 'vsplit' then
+            local other = last.other
+            vim.api.nvim_win_close(0, true)
+            if usable(other, false) then
+                vim.api.nvim_set_current_win(other)
+            end
+            return
+        end
         if usable(last.other, false) then
             vim.api.nvim_set_current_win(last.other)
             return
@@ -326,7 +343,7 @@ function M.toggle()
         vim.api.nvim_set_current_win(target)
         vim.cmd('startinsert')
     else
-        M.open('split')
+        M.open(last_slot and #slots[last_slot].terms > 0 and last_slot or 'split')
     end
 end
 
