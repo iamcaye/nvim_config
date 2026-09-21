@@ -211,6 +211,75 @@ function M.close(name)
     end
 end
 
+--- Move the terminal shown in the current slot into another slot (inserted
+--- after that slot's current terminal), opening the target window if needed.
+--- Without `to`, asks which slot. The source window closes if it was left
+--- empty (fullscreen instead gets its previous buffer back).
+function M.move(to)
+    local from_name, from = slot_of_current_win()
+    if not from or from.idx == 0 then
+        return
+    end
+    if not to then
+        local choices = {}
+        for _, name in ipairs({ 'split', 'vsplit', 'tab', 'fullscreen' }) do
+            if name ~= from_name then
+                choices[#choices + 1] = name
+            end
+        end
+        vim.ui.select(choices, { prompt = 'Move terminal to:' }, function(choice)
+            if choice then
+                M.move(choice)
+            end
+        end)
+        return
+    end
+    local target = slot_for_name(to)
+    if target == from then
+        return
+    end
+    local buf = table.remove(from.terms, from.idx)
+    if #from.terms == 0 then
+        local win = from.win
+        from.win, from.idx = nil, 0
+        if win and vim.api.nvim_win_is_valid(win) then
+            if from_name == 'fullscreen' then
+                local alt = vim.fn.bufnr('#')
+                if alt > 0 and vim.bo[alt].buftype ~= 'terminal' then
+                    vim.api.nvim_win_call(win, function()
+                        vim.cmd('buffer #')
+                    end)
+                end
+            else
+                vim.api.nvim_win_close(win, true)
+            end
+        end
+    else
+        show(from, math.min(from.idx, #from.terms), false)
+    end
+    table.insert(target.terms, target.idx + 1, buf)
+    if not target.open then
+        -- Fullscreen takes over the current window, so make sure that's a
+        -- plain window and not another slot's.
+        local function is_slot_win(w)
+            for _, slot in pairs(slots) do
+                if slot.win == w then
+                    return true
+                end
+            end
+        end
+        if is_slot_win(vim.api.nvim_get_current_win()) then
+            for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                if not is_slot_win(w) and vim.api.nvim_win_get_config(w).relative == '' then
+                    vim.api.nvim_set_current_win(w)
+                    break
+                end
+            end
+        end
+    end
+    show(target, target.idx + 1, true)
+end
+
 --- Best-effort hint at what a terminal last did: terminal buffers mirror the
 --- live screen, so the very last line is usually the current (possibly
 --- empty) prompt; the first non-blank line above it is typically the tail
