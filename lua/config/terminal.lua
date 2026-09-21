@@ -268,6 +268,68 @@ function M.pick()
     })
 end
 
+-- Toggle between terminals and regular windows. WinLeave remembers the last
+-- window that was a terminal and the last that wasn't (floats ignored, e.g.
+-- pickers), so `toggle()` can hop back and forth across tabs too.
+local last = { term = nil, other = nil }
+
+vim.api.nvim_create_autocmd('WinLeave', {
+    callback = function()
+        local win = vim.api.nvim_get_current_win()
+        if vim.api.nvim_win_get_config(win).relative ~= '' then
+            return
+        end
+        last[vim.bo.buftype == 'terminal' and 'term' or 'other'] = win
+    end,
+})
+
+local function usable(win, want_term)
+    return win
+        and vim.api.nvim_win_is_valid(win)
+        and vim.api.nvim_win_get_config(win).relative == ''
+        and (vim.bo[vim.api.nvim_win_get_buf(win)].buftype == 'terminal') == want_term
+end
+
+--- From a terminal: back to the last non-terminal window. From anywhere
+--- else: to the last terminal window (entering insert mode).
+function M.toggle()
+    if vim.bo.buftype == 'terminal' then
+        vim.cmd('stopinsert')
+        if usable(last.other, false) then
+            vim.api.nvim_set_current_win(last.other)
+            return
+        end
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+            if usable(win, false) then
+                vim.api.nvim_set_current_win(win)
+                return
+            end
+        end
+        -- Fullscreen slot: the terminal replaced the file in this very
+        -- window, so restore the alternate buffer.
+        local alt = vim.fn.bufnr('#')
+        if alt > 0 and vim.bo[alt].buftype ~= 'terminal' then
+            vim.cmd('buffer #')
+        end
+        return
+    end
+    local target = usable(last.term, true) and last.term
+    if not target then
+        for _, slot in pairs(slots) do
+            if usable(slot.win, true) then
+                target = slot.win
+                break
+            end
+        end
+    end
+    if target then
+        vim.api.nvim_set_current_win(target)
+        vim.cmd('startinsert')
+    else
+        M.open('split')
+    end
+end
+
 --- Drop stale terminal buffers whose cwd sits under `path` from every slot's
 --- stack. Used by the worktrees.nvim `on_switch` hook after a worktree
 --- switch so cycling/picker never point at a buffer that no longer exists.
