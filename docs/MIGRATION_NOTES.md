@@ -9,7 +9,7 @@
 - Harpoon mappings.
 - Gitsigns hunk mappings.
 - Snacks UI helpers.
-- Copilot and Sidekick toggles.
+- Copilot toggle.
 - Formatting with Conform.
 - Linting with nvim-lint.
 - DAP basics.

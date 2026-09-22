@@ -31,7 +31,6 @@ vim.pack.add({
 	{ src = gh("leoluz/nvim-dap-go") },
 	-- { src = gh('wakatime/vim-wakatime') },
 	{ src = gh("github/copilot.vim"), version = "release" },
-	{ src = gh("folke/sidekick.nvim") },
 	{ src = gh("rcarriga/nvim-notify") },
 	{ src = gh("folke/noice.nvim") },
 	{ src = gh("MunifTanjim/nui.nvim") },
