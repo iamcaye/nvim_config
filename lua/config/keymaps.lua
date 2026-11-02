@@ -37,6 +37,15 @@ end, { desc = 'Pick terminal' })
 map({ 'n', 't' }, '<C-Space>', function()
     term.toggle()
 end, { desc = 'Toggle terminal / last non-terminal window' })
+-- Fallback for when <C-Space> is swallowed (macOS input-source shortcut, some
+-- terminals). Terminal mode only: in normal mode <C-/> toggles comments.
+-- Many terminals send <C-/> as <C-_>, so map both.
+map('t', '<C-/>', function()
+    term.toggle()
+end, { desc = 'Toggle terminal / last non-terminal window' })
+map('t', '<C-_>', function()
+    term.toggle()
+end, { desc = 'Toggle terminal / last non-terminal window' })
 map('n', ']t', function()
     term.cycle(1)
 end, { desc = 'Next terminal in slot' })
